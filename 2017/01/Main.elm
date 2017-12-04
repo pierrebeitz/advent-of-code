@@ -85,11 +85,16 @@ solve ( a, b ) acc =
         acc
 
 
-toPairs : Array number -> number -> number -> ( number, number )
+{-| Build a tuple of a number and the number it's going to be compared to
+-}
+toPairs : Array number -> Int -> number -> ( number, number )
 toPairs arr i el =
     let
+        length =
+            Array.length arr
+
         complementingNumber =
-            case Array.get ((i + 1) % Array.length arr) arr of
+            case Array.get ((i + length // 2) % length) arr of
                 Just number ->
                     number
 
