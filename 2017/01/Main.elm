@@ -4,7 +4,35 @@ import Array exposing (Array)
 import Html exposing (Html, text)
 
 
-{-| Split the pretty long list because of [this bug](https://github.com/elm-lang/elm-compiler/issues/1521) that otherwise results in an exceeded call stack.
+main : Html msg
+main =
+    { part1 = solve <| \i -> i + 1
+    , part2 = solve <| \i -> i + len // 2
+    }
+        |> toString
+        |> text
+
+
+solve : (Int -> Int) -> Maybe number
+solve pairingFn =
+    let
+        -- Build tuples of numbers that are compared for equality
+        pairUp i el =
+            ( Just el, Array.get (pairingFn i % len) captcha )
+
+        -- Add up the tuples
+        addUp ( a, b ) acc =
+            if a == b then
+                Maybe.map2 (+) acc a
+            else
+                acc
+    in
+    captcha
+        |> Array.indexedMap pairUp
+        |> Array.foldl addUp (Just 0)
+
+
+{-| Split the pretty long list because of [this bug](https://github.com/elm-lang/elm-compiler/issues/1521). We'll see an exceeded call stack otherwise.
 -}
 captcha : Array number
 captcha =
@@ -16,37 +44,6 @@ captcha =
             ++ [ 5, 8, 9, 4, 4, 3, 5, 6, 9, 2, 7, 9, 9, 8, 3, 9, 2, 1, 7, 4, 6, 7, 2, 5, 3, 9, 8, 6, 2, 1, 8, 2, 1, 3, 1, 3, 1, 2, 4, 9, 7, 8, 6, 8, 3, 3, 3, 3, 3, 9, 3, 6, 3, 3, 2, 2, 5, 7, 7, 9, 5, 1, 9, 1, 9, 3, 7, 9, 4, 2, 6, 8, 8, 6, 6, 8, 1, 8, 2, 6, 2, 9, 4, 8, 9, 1, 9, 1, 6, 9, 3, 1, 5, 4, 1, 8, 4, 1, 7, 7, 3, 9, 8, 1, 8, 6, 4, 6, 2, 4, 8, 1, 3, 1, 6, 8, 3, 4, 6, 7, 8, 7, 3, 3, 7, 1, 3, 6, 1, 4, 8, 8, 9, 4, 3, 9, 3, 5, 2, 9, 7, 6, 1, 4, 4, 7, 2, 6, 1, 6, 2, 2, 1, 4, 6, 4, 8, 9, 2, 2, 1, 5, 9, 7, 1, 9, 9, 7, 9, 1, 4, 3, 7, 3, 5, 8, 1, 5, 4, 7, 8, 6, 3, 3, 9, 1, 2, 6, 3, 3, 1, 8, 5, 3, 3, 4, 5, 2, 9, 4, 8, 4, 7, 7, 9, 3, 2, 2, 8, 1, 8, 6, 1, 1, 4, 3, 8, 1, 9, 4, 5, 2, 2, 2, 9, 2, 2, 7, 8, 7, 8, 7, 6, 5, 3, 7, 6, 3, 3, 2, 8, 9, 4, 4, 4, 2, 1, 5, 1, 6, 5, 6, 9, 1, 8, 1, 1, 7, 8, 5, 1, 7, 9, 1, 5, 7, 4, 5, 6, 2, 5, 2, 9, 5, 1, 5, 8, 6, 1, 1, 6, 3, 6, 3, 6, 5, 2, 5, 3, 9, 4, 8, 4, 5, 5, 7, 2, 7, 6, 5, 3, 6, 7, 2, 9, 2, 2, 2, 9, 9, 5, 8, 2, 3, 5, 2, 7, 6, 6, 4, 8, 4 ]
 
 
-main : Html msg
-main =
-    captcha
-        |> Array.indexedMap (toPairs captcha)
-        |> Array.foldl solve 0
-        |> toString
-        |> text
-
-
-solve : ( number, number ) -> number -> number
-solve ( a, b ) acc =
-    if a == b then
-        acc + a
-    else
-        acc
-
-
-{-| Build a tuple of a number and the number it's going to be compared to
--}
-toPairs : Array number -> Int -> number -> ( number, number )
-toPairs arr i el =
-    let
-        length =
-            Array.length arr
-
-        complementingNumber =
-            case Array.get ((i + length // 2) % length) arr of
-                Just number ->
-                    number
-
-                Nothing ->
-                    Debug.crash "arrayindexoutofboundsexception :-)"
-    in
-    ( el, complementingNumber )
+len : Int
+len =
+    Array.length captcha
