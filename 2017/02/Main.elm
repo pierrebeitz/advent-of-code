@@ -9,18 +9,44 @@ type alias Row =
 
 main : Html msg
 main =
-    rows
-        |> List.map minmaximidiff
-        |> List.foldl (Maybe.map2 (+)) (Just 0)
+    { part1 = solve minMaxDiff
+    , part2 = solve division
+    }
         |> toString
         |> text
 
 
-minmaximidiff : Row -> Maybe Int
-minmaximidiff row =
-    Maybe.map2 (\min max -> max - min)
-        (List.minimum row)
+solve : (Row -> Maybe Int) -> Maybe Int
+solve fn =
+    rows
+        |> List.map fn
+        |> List.foldl (Maybe.map2 (+)) (Just 0)
+
+
+division : Row -> Maybe Int
+division row =
+    let
+        isValidDivisor i j =
+            i % j == 0 && i /= j
+
+        findPairAndDivide i =
+            case List.head <| List.filter (isValidDivisor i) row of
+                Just divisor ->
+                    Just (i // divisor)
+
+                Nothing ->
+                    Nothing
+    in
+    row
+        |> List.filterMap findPairAndDivide
+        |> List.head
+
+
+minMaxDiff : Row -> Maybe Int
+minMaxDiff row =
+    Maybe.map2 (-)
         (List.maximum row)
+        (List.minimum row)
 
 
 rows : List Row
