@@ -9,18 +9,16 @@ type alias Row =
 
 main : Html msg
 main =
-    { part1 = solve minMaxDiff
-    , part2 = solve division
+    { part1 = rows |> List.map minMaxDiff |> sum
+    , part2 = rows |> List.map division |> sum
     }
         |> toString
         |> text
 
 
-solve : (Row -> Maybe Int) -> Maybe Int
-solve fn =
-    rows
-        |> List.map fn
-        |> List.foldl (Maybe.map2 (+)) (Just 0)
+sum : List (Maybe number) -> Maybe number
+sum =
+    List.foldl (Maybe.map2 (+)) (Just 0)
 
 
 division : Row -> Maybe Int
