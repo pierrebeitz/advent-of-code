@@ -1,6 +1,7 @@
 module Main exposing (..)
 
 import Array exposing (Array)
+import Array.Extra as Array
 import Html exposing (Html, text)
 
 
@@ -35,28 +36,20 @@ main =
 countJumps : State -> AfterJumpChange -> Int
 countJumps s afterJump =
     let
-        -- goes through next steps until the currentIndex is out of bounds, which tells us that we're out of the maze
+        -- jumps and jumps until the currentIndex is out of bounds, which tells us that we're out of the maze
         jumpCounter : Int -> State -> Int
-        jumpCounter step state =
-            case jump state of
-                ( Just currentIndex, maze ) ->
-                    jumpCounter (step + 1) ( currentIndex, maze )
-
-                _ ->
-                    step
-
-        jump : State -> ( Maybe Int, Maze )
-        jump ( currentIndex, maze ) =
+        jumpCounter stepCount ( currentIndex, maze ) =
             let
-                instruction =
-                    Array.get currentIndex maze
-
-                updateMaze i =
-                    Array.set currentIndex (afterJump i) maze
+                nextIndex =
+                    Array.get currentIndex maze |> Maybe.map ((+) currentIndex)
             in
-            ( instruction |> Maybe.map ((+) currentIndex)
-            , instruction |> Maybe.map updateMaze |> Maybe.withDefault maze
-            )
+            case nextIndex of
+                Just index ->
+                    jumpCounter (stepCount + 1)
+                        ( index, Array.update currentIndex afterJump maze )
+
+                Nothing ->
+                    stepCount
     in
     jumpCounter 0 s
 

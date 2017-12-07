@@ -3,9 +3,13 @@
     "summary": "Some solutions in elm for the advent of code.",
     "repository": "https://github.com/pierrebeitz/advent-of-code.git",
     "license": "BSD3",
-    "source-directories": ["."],
+    "source-directories": [
+        "."
+    ],
     "exposed-modules": [],
     "dependencies": {
+        "elm-community/array-extra": "1.0.2 <= v < 2.0.0",
+        "elm-community/list-extra": "6.1.0 <= v < 7.0.0",
         "elm-lang/core": "5.1.1 <= v < 6.0.0",
         "elm-lang/html": "2.0.0 <= v < 3.0.0"
     },

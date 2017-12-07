@@ -1,32 +1,28 @@
 module Main exposing (..)
 
 import Html exposing (Html, text)
+import List.Extra as List exposing (allDifferent)
 import Set exposing (Set)
-
-
-main : Html msg
-main =
-    { part1 = List.length <| List.filter hasOnlyUniqMembers input
-    , part2 = List.length <| List.filter doesNotContainAnagrams input
-    }
-        |> toString
-        |> text
-
-
-hasOnlyUniqMembers : Passphrase -> Bool
-hasOnlyUniqMembers passphrase =
-    List.length passphrase
-        == (passphrase |> Set.fromList |> Set.size)
-
-
-doesNotContainAnagrams : Passphrase -> Bool
-doesNotContainAnagrams =
-    List.map (String.toList >> List.sort >> String.fromList)
-        >> hasOnlyUniqMembers
 
 
 type alias Passphrase =
     List String
+
+
+main : Html msg
+main =
+    let
+        count filter =
+            List.length <| List.filter filter input
+
+        sortStrings =
+            List.map (String.toList >> List.sort >> String.fromList)
+    in
+    { part1 = count <| allDifferent
+    , part2 = count <| allDifferent << sortStrings
+    }
+        |> toString
+        |> text
 
 
 input : List Passphrase
