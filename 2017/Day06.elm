@@ -1,7 +1,7 @@
 module Main exposing (..)
 
-import Array exposing (Array)
 import Html exposing (Html, text)
+import List.Extra as List
 import Set exposing (Set)
 
 
@@ -17,25 +17,26 @@ main =
         |> text
 
 
-reallocate : Banks -> Int
 reallocate banks =
     let
         -- cycles through states until a duplicate is hit.
-        -- remembers old states in a set, so we can be lazy and just compare set-sizes before and after each cycle.
+        reallocate_ : List Banks -> Banks -> { loopOccursOnCycle : Int, seenAgo : Int }
         reallocate_ oldStates banks =
             let
                 currentState =
                     cycle banks
 
                 states =
-                    oldStates |> Set.insert currentState
+                    currentState :: oldStates
             in
-            if Set.size states == Set.size oldStates then
-                Set.size states + 1
+            if List.member currentState oldStates then
+                { loopOccursOnCycle = List.length states
+                , seenAgo = oldStates |> List.takeWhile ((/=) currentState) |> List.length |> (+) 1
+                }
             else
                 reallocate_ states currentState
     in
-    reallocate_ Set.empty banks
+    reallocate_ [] banks
 
 
 cycle : Banks -> Banks
