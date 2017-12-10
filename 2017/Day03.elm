@@ -1,12 +1,14 @@
 module Main exposing (..)
 
+import Array
+import Array.Extra as Array
 import Html exposing (Html, text)
 
 
 main : Html msg
 main =
     { part1 = distanceOf 361527
-    , part2 = "TODO"
+    , part2 = iterateTillValue 361527 -- 363010
     }
         |> toString
         |> text
@@ -40,6 +42,84 @@ distanceOf n =
         |> List.map (\center -> abs (n - center))
         |> List.minimum
         |> Maybe.map (\min -> min + r)
+
+
+
+-- PART 2
+
+
+iterateTillValue num =
+    let
+        iterateTillValueHelp index list =
+            let
+                largestVal =
+                    Array.getUnsafe (index - 1) list
+            in
+            if largestVal > num then
+                ( largestVal, list )
+            else
+                indexesToSumUp index
+                    |> List.map (\i -> Array.getUnsafe i list)
+                    |> List.sum
+                    |> (\sum -> Array.append list (Array.fromList [ sum ]))
+                    |> iterateTillValueHelp (index + 1)
+    in
+    iterateTillValueHelp (Array.length lazyMansStart) lazyMansStart
+
+
+{-| as it already took enough time to figure stuff out and i'm too lazy to think about what to do if a field is
+`isOneBeforeCorner` AND `isOneAfterCorner` at the same time, let's just start with the input from the puzzle description :D
+-}
+lazyMansStart =
+    Array.fromList [ 0, 1, 1, 2, 4, 5, 10, 11, 23, 25 ]
+
+
+{-| find out which previous indexes to sum up for a given index.
+
+This can be found out looking at the "corners" (3, 5, 7, 10, 13, 17, 21 and so on...)
+
+Then there are a couple cases:
+
+  - we're on a corner -> We just "see" our predecessor (pred) + the corner in the ring below.
+    (13 -> [12, 3])
+  - one index before a corner -> pred + corner "below" + one before
+    (12 -> [11, 3, 2])
+  - one index after a corner -> pred + corner "below" + one after + the second previous
+    (14 -> [13, 12, 2])
+  - on any other index -> pred + one ring below + the one before that + the one after that
+    (15 -> [14, 4, 3, 5])
+
+-}
+indexesToSumUp index =
+    let
+        -- the index on the current ring starting at 1
+        indexOnRing =
+            index - (((2 * ring index) - 1) ^ 2)
+
+        edgeLength =
+            2 * ring index
+
+        cornerOffset n =
+            List.any (\c -> c == indexOnRing + n)
+                [ 1, edgeLength, 2 * edgeLength, 3 * edgeLength, 4 * edgeLength + 1 ]
+
+        innerRingIndexes =
+            List.map (\i -> index - ((ring index - 1) * 8) - (((indexOnRing - 1) // edgeLength) * 2 + 1) + i)
+    in
+    if cornerOffset 0 then
+        (index - 1)
+            :: innerRingIndexes
+                [ if indexOnRing == 1 then
+                    1
+                  else
+                    -1
+                ]
+    else if cornerOffset 1 then
+        index - 1 :: innerRingIndexes [ 0, -1 ]
+    else if cornerOffset -1 then
+        index - 1 :: index - 2 :: innerRingIndexes [ 0, 1 ]
+    else
+        index - 1 :: innerRingIndexes [ -1, 0, 1 ]
 
 
 
