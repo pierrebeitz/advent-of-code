@@ -16,7 +16,7 @@ main =
 
 
 type Instruction
-    = Instruction Operation Query
+    = Instruction Operation Condition
 
 
 type
@@ -26,9 +26,9 @@ type
 
 
 type
-    Query
+    Condition
     --  if    rdx        >=     -42
-    = Query Register Comparator Int
+    = Condition Register Comparator Int
 
 
 type alias Register =
@@ -49,7 +49,7 @@ processInstructions input =
         get reg dict =
             Dict.get reg dict |> Maybe.withDefault 0
 
-        isQueryMatching (Query reg comp int) dict =
+        isQueryMatching (Condition reg comp int) dict =
             comp (get reg dict) int
 
         applyOperation (Operation reg op int) dict =
@@ -122,9 +122,9 @@ parse input =
                 , int
                 ]
 
-        query : Parser Query
-        query =
-            succeed Query
+        condition : Parser Condition
+        condition =
+            succeed Condition
                 |. keyword "if"
                 |. spaces
                 |= register
@@ -138,7 +138,7 @@ parse input =
             succeed Instruction
                 |= operation
                 |. spaces
-                |= query
+                |= condition
                 |. spaces
                 |. ignore zeroOrMore ((==) '\n')
 
