@@ -1,4 +1,4 @@
-module Main exposing (..)
+module Day12 exposing (countGroups)
 
 import Dict
 import Html exposing (Html, text)
@@ -9,31 +9,30 @@ import String
 
 main : Html msg
 main =
-    { part1 = getConnections 0 |> Set.size
-    , part2 = countGroups |> Tuple.first
+    { part1 = getConnections 0 input |> Set.size
+    , part2 = countGroups input |> Tuple.first
     }
         |> toString
         |> text
 
 
-countGroups =
+countGroups input =
     Dict.keys input
         |> List.foldl
             (\i ( count, seen ) ->
                 if Set.member i seen then
                     ( count, seen )
                 else
-                    ( count + 1, Set.union (getConnections i) seen )
+                    ( count + 1, Set.union (getConnections i input) seen )
             )
             ( 0, Set.empty )
 
 
-get i =
-    Dict.get i input |> Maybe.withDefault Set.empty
-
-
-getConnections startIndex =
+getConnections startIndex input =
     let
+        get i =
+            Dict.get i input |> Maybe.withDefault Set.empty
+
         getConnectionsHelp toLookup seenInThePast =
             let
                 seen =

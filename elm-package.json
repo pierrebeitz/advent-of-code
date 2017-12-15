@@ -4,7 +4,7 @@
     "repository": "https://github.com/pierrebeitz/advent-of-code.git",
     "license": "BSD3",
     "source-directories": [
-        "."
+      ".", "2017"
     ],
     "exposed-modules": [],
     "dependencies": {

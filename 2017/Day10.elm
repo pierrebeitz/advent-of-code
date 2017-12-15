@@ -1,4 +1,4 @@
-module Main exposing (..)
+module Day10 exposing (knothash)
 
 import Bitwise
 import Char
@@ -20,7 +20,7 @@ type alias State =
 main : Html msg
 main =
     { part1 = process part1InitialState |> .list |> take 2 |> product
-    , part2 = process64Rounds part2Input |> .list |> groupsOf 16 |> List.map (List.foldl1 Bitwise.xor >> Maybe.withDefault 0 >> Hex.toString) |> String.join ""
+    , part2 = knothash "70,66,255,2,48,0,54,48,80,141,244,254,160,108,1,41"
     }
         |> toString
         |> text
@@ -66,17 +66,6 @@ moveToFront i =
 -- Part2
 
 
-part2Input =
-    let
-        list =
-            "70,66,255,2,48,0,54,48,80,141,244,254,160,108,1,41"
-                |> String.toList
-                |> List.map Char.toCode
-                |> (\l -> l ++ [ 17, 31, 73, 47, 23 ])
-    in
-    State 0 0 list (range 0 255)
-
-
 process64Rounds initialState =
     let
         processHelp r state =
@@ -86,3 +75,17 @@ process64Rounds initialState =
                 state
     in
     processHelp 64 initialState
+
+
+knothash string =
+    let
+        initialState =
+            String.toList string
+                |> List.map Char.toCode
+                |> (\l -> State 0 0 (l ++ [ 17, 31, 73, 47, 23 ]) (range 0 255))
+    in
+    process64Rounds initialState
+        |> .list
+        |> groupsOf 16
+        |> List.map (List.foldl1 Bitwise.xor >> Maybe.withDefault 0 >> Hex.toString >> String.padLeft 2 '0')
+        |> String.join ""

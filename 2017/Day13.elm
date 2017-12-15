@@ -6,9 +6,6 @@ import List.Extra as List
 import String
 
 
--- 293880 too low
-
-
 main : Html msg
 main =
     { part1 = severity 0
