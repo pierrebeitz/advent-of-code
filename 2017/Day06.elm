@@ -11,10 +11,8 @@ type alias Banks =
 
 main : Html msg
 main =
-    { part1 = reallocate banks
-    }
-        |> toString
-        |> text
+    (text << toString)
+        { part1and2 = reallocate banks }
 
 
 reallocate banks =
