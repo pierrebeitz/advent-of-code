@@ -2,6 +2,7 @@ module Main exposing (..)
 
 import Html exposing (Html, div, text)
 import List.Extra as List exposing (splitAt)
+import Parser exposing ((|.), (|=), Count(Exactly), Parser, end, ignore, ignoreUntil, int, keep, keyword, lazy, map, oneOf, oneOrMore, repeat, succeed, symbol, zeroOrMore)
 
 
 main : Html msg
