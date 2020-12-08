@@ -1,40 +1,39 @@
 package main
 
 import (
-    "fmt"
-    "io/ioutil"
-    "log"
-		"strings"
-		"strconv"
+	"fmt"
+	"io/ioutil"
+	"strconv"
+	"strings"
 )
 
 func main() {
-    content, err := ioutil.ReadFile("input1.txt")
-     if err != nil {
-          log.Fatal(err)
-     }
+	content, _ := ioutil.ReadFile("input1.txt")
+	strs := strings.Fields(string(content))
+	ints := make([]int, len(strs))
 
-		strs := strings.Fields(string(content))
+	for i, n := range strs {
+		parsedInt, _ := strconv.Atoi(n)
+		ints[i] = parsedInt
+	}
 
-
-		ints := make([]int, len(strs))
-    for i, n := range strs {
-			parsedInt, err := strconv.Atoi(n)
-			if (err != nil) {
-				log.Fatal(err)
+	for _, n := range ints {
+		for _, m := range ints {
+			if n+m == 2020 {
+				fmt.Println("part 1: ", n*m)
 			}
-			ints[i] = parsedInt
 		}
+	}
 
-    for _, n := range ints {
-			for _, m := range ints {
-			  for _, o := range ints {
-					if n + m + o == 2020 {
-						fmt.Printf("%d, %d, %d\n", n, m, o)
-						fmt.Println(n * m * o)
-						return
-					}
+	// yes, this obviously does not scale. but for now it works :)
+	for _, n := range ints {
+		for _, m := range ints {
+			for _, o := range ints {
+				if n+m+o == 2020 {
+					fmt.Println("part 2: ", n*m*o)
+					return
 				}
 			}
-    }
+		}
+	}
 }
